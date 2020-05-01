@@ -1,0 +1,33 @@
+name: 'Test Case #1'
+description: 'test case scenario 1 description'
+purpose: 'test' # possible values: send, receive, test
+
+sender:
+  connectionString: $(connStr)  # environment variable or the connection string
+  events:
+    - event: 'msg1'
+      data: 'my message 123'
+      base64: false
+      properties:
+        - messageId: 'myCheckId123'
+
+    - event:
+      data: 'my message 456'
+      base64: false
+      properties:
+        - messageId: 'myCheckId456'
+
+    - event:
+      data: 'my message 789'
+      base64: false
+      properties:
+        - messageId: 'myCheckId789'
+          
+receiver:
+  connectionString: $(connStr)  # environment variable or the connection string
+  consumerGroup: '$Default'
+  dataFilter:
+    - 'my message 789'
+  propertyFilter:
+    - 'messageId:myCheckId789'
+  verbose: true

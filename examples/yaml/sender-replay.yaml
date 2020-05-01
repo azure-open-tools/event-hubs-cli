@@ -1,0 +1,14 @@
+name: 'Send 100k Messages'
+
+purpose: 'send' # possible values: send, receive, test
+
+settings:
+  connectionString: $(connStr) # environment variable or the connection string
+  repeat: 10
+  interval: 500 #in milliseconds
+  maxNumberOfThreads: -1 # -1 is the default value. the default max number of threads will be the number of cpus.
+
+message:
+  content: 'my message'
+  replayMessages: true
+  fileMessagePath: '/home/user/my-file-with-messages.json'

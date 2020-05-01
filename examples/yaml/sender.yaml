@@ -1,0 +1,19 @@
+name: 'Send 100k Messages'
+
+purpose: 'send' # possible values: send, receive, test
+
+sender:
+  connectionString: $(connStr)  # environment variable or the connection string
+  repeat: 10
+  interval: 500 # in milliseconds
+  replayMessages: false
+  fileMessagePath: ''
+
+  event:
+    data: 'my message'
+    base64: false
+    batch: false
+    numberOfMessages: 100000 # 100k
+    properties: # properties are formatted as a single string like 'propertyName:value'
+      - 'messageId:1234'
+      - 'myBusinessLogicId:5678'

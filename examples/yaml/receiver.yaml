@@ -1,0 +1,18 @@
+name: 'Receive Messages'
+
+purpose: 'receive' # possible values: send, receive, test
+
+receiver:
+  connectionString: $(connStr)  # environment variable or the connection string
+  consumerGroup: '$Default'
+  dataFilter:
+    - 'filter1'
+    - 'filter2'
+    - 'filter3'
+  propertyFilter:
+    - 'propertyName1:value1'
+    - 'propertyName2:value2'
+    - 'propertyName3:value3'
+  verbose: true
+  splitOutputIntoFiles: false
+  pathToWriteFile: ''
