@@ -8,11 +8,11 @@ branches:
     - issue/*
 
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco upgrade; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install hub; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install make; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install hub; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install make; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo snap install hub --classic; fi
 
 jobs:
