@@ -7,10 +7,10 @@ branches:
     - feature/*
     - issue/*
 
-stages:
-  - build
-  - name: github-release
-    if: branch = master
+os:
+  - linux
+  - osx
+  - windows
 
 addons:
   snaps:
@@ -24,28 +24,14 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install hub; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install make; fi
 
-jobs:
-  include:
-    - os: linux
-      dist: bionic
+- pushd sender
+- make build-release
+- popd
+- pushd receiver
+- make build-release
+- popd
 
-    - os: osx
-      osx_image: xcode11.3
-
-    - os: windows
-
-    - stage: build
-      name: "Build"
-      script:
-        - pushd sender
-        - make build-release
-        - popd
-        - pushd receiver
-        - make build-release
-        - popd
-
-    - stage: github-release
-      name: "GitHub Release"
-      script:
-        - make release
-        - make release-binaries
+if: branch = master
+script:
+  - make release
+  - make release-binaries
