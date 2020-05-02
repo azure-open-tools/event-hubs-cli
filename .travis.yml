@@ -7,31 +7,52 @@ branches:
     - feature/*
     - issue/*
 
-os:
-  - linux
-  - osx
-  - windows
-
-addons:
-  snaps:
-    - name: hub
-      confinement: classic
-  homebrew:
-    packages: hub
-    #update: true
-
 before_install:
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco update; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install hub; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install make; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install hub; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then snap install hub --classic; fi
 
-- pushd sender
-- make build-release
-- popd
-- pushd receiver
-- make build-release
-- popd
+jobs:
+  include:
+    - os: linux
+      dist: bionic
+      script:
+        - pushd sender
+        - make build-release
+        - popd
+        - pushd receiver
+        - make build-release
+        - popd
 
-if: branch = master
-script:
-  - make release
-  - make release-binaries
+    - os: osx
+      osx_image: xcode11.3
+      if: branch = master
+      script:
+        - pushd sender
+        - make build-release
+        - popd
+        - pushd receiver
+        - make build-release
+        - popd
+        - make release
+        - make release-binaries
+
+    - os: windows
+      if: branch = master
+      script:
+        - pushd sender
+        - make build-release
+        - popd
+        - pushd receiver
+        - make build-release
+        - popd
+        - make release
+        - make release-binaries
+
+    if: branch = master
+    script:
+      - make release
+      - make release-binaries
