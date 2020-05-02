@@ -19,3 +19,6 @@
 
 receiver.sh
 sender.sh
+
+ehs-*
+ehr-*

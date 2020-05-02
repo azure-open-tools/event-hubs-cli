@@ -1,7 +1,7 @@
 package main
 
 import (
-	"eh-sender-receiver/cli/receiver/commands"
+	"event-hubs-cli/receiver/commands"
 )
 
 func main() {
