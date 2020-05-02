@@ -26,10 +26,11 @@ jobs:
         - pushd receiver
         - make build-release
         - popd
+        - make release
+        - make release-binaries
 
     - os: osx
       osx_image: xcode11.3
-      if: branch = master
       script:
         - pushd sender
         - make build-release
@@ -41,7 +42,6 @@ jobs:
         - make release-binaries
 
     - os: windows
-      if: branch = master
       script:
         - pushd sender
         - make build-release
@@ -51,8 +51,3 @@ jobs:
         - popd
         - make release
         - make release-binaries
-
-    if: branch = master
-    script:
-      - make release
-      - make release-binaries

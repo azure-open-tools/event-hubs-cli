@@ -1,14 +1,19 @@
 #!/usr/bin/env bash
 
 git fetch --all
-latestTag="$(git --no-pager tag -l | tail -1)"
-# git for-each-ref --sort=creatordate --format '%(creatordate)'
+isMaster=$(git rev-parse --abbrev-ref HEAD)
 
-echo "Latest Tag: $latestTag"
-#find . -type f -iname "ehs-*" -exec ls -lah {} \;
+if [[ "$isMaster" == *"master"* ]];
+then
+  latestTag="$(git --no-pager tag -l | tail -1)"
+  # git for-each-ref --sort=creatordate --format '%(creatordate)'
 
-# sender
-find . -type f -iname "ehs-*" -exec hub release edit -m "" -a {} "$latestTag" \;
+  echo "Latest Tag: $latestTag"
+  #find . -type f -iname "ehs-*" -exec ls -lah {} \;
 
-# receiver
-find . -type f -iname "ehr-*" -exec hub release edit -m "" -a {} "$latestTag" \;
+  # sender
+  find . -type f -iname "ehs-*" -exec hub release edit -m "" -a {} "$latestTag" \;
+
+  # receiver
+  find . -type f -iname "ehr-*" -exec hub release edit -m "" -a {} "$latestTag" \;
+fi
