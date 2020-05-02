@@ -18,7 +18,7 @@ rcvResult=$(az eventhubs eventhub authorization-rule keys list --resource-group 
 rcvConnStr=$(echo -e $rcvResult | jq '.primaryConnectionString' | xargs)
 
 # using the default consumer group
-./ehrt -c $rcvConnStr
+./ehr -c $rcvConnStr
 
 # specifying a consumer group
-./ehrt -c $rcvConnStr -g $consumerGroup
+# ./ehr -c $rcvConnStr -g $consumerGroup
