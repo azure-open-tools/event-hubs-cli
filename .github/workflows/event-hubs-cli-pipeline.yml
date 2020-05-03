@@ -25,13 +25,12 @@ jobs:
     - name: Build
       shell: bash
       run: |
-        go env
-        cd sender
+        pushd sender
         make build-local
-        cd ..
-        cd receiver
+        popd
+        pushd receiver
         make build-local
-        cd ..
+        popd
 
   release:
     name: Release
@@ -56,10 +55,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        cd sender
+        pushd sender
         make build-release
-        cd ..
-        cd receiver
+        popd
+        pushd receiver
         make build-release
-        cd ..
+        popd
         make release
