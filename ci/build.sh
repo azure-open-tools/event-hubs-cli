@@ -15,6 +15,7 @@ if [[ "$targetos" == *"Windows_NT"* ]];
 then
 	set GOARCH="$targetarch"
 	set GOOS="$targetos"
+	set GO111MODULE=on
 	extension=".exe"
 	go build -ldflags "-s -w" -o "$name-windows""$targetarch"-"$version""$extension" main.go
 	mv "$name-windows""$targetarch"-"$version""$extension" ../
@@ -25,10 +26,10 @@ else
   if [[ "$targetos" == *"MacOSX"* ]];
   then
   	echo "$PWD"
-    env GOOS="darwin" GOARCH="$targetarch" go build -ldflags "-s -w" -o "$name-darwin-""$targetarch"-"$version" main.go
+    env GO111MODULE=on GOOS="darwin" GOARCH="$targetarch" go build -ldflags "-s -w" -o "$name-darwin-""$targetarch"-"$version" main.go
   	mv "$name-darwin-""$targetarch"-"$version" ../
   else
-  	env GOOS="linux" GOARCH="$targetarch" go build -ldflags "-s -w" -o "$name-linux-""$targetarch"-"$version" main.go
+  	env GO111MODULE=on GOOS="linux" GOARCH="$targetarch" go build -ldflags "-s -w" -o "$name-linux-""$targetarch"-"$version" main.go
     mv "$name-linux-""$targetarch"-"$version" ../
   fi
 fi
