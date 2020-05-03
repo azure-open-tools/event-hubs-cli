@@ -1,13 +1,1 @@
-SHELL:=/bin/bash
-
-lint:
-	@ docker run --rm -v ${PWD}:/app -w /app golangci/golangci-lint:v1.25.1 golangci-lint run
-
-build-local: lint
-	@ go version
-	@ go clean
-	@ go build -o ehcli-bin main.go
-
-build-release: lint
-	@ chmod +x ../ci/build.sh
-	@ ../ci/build.sh ${PWD}/../version.go "ehcli"
+SHELL:=/bin/bashlint:	@ docker run --rm -v ${PWD}:/app -w /app golangci/golangci-lint:v1.25.1 golangci-lint runbuild-local: lint	@ go version	@ go clean	@ go build -o ehcli-bin main.gobuild-release:	@ chmod +x ../ci/build.sh	@ ../ci/build.sh ${PWD}/../version.go "ehcli"
