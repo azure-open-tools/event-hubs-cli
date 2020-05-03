@@ -62,3 +62,4 @@ jobs:
         make build-release
         popd
         make release
+        make release-binaries

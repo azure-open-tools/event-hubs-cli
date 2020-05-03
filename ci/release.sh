@@ -10,8 +10,8 @@ else
   version=$(go run "$versionFile")
 fi
 
+git fetch --all
 checkTag=$(git --no-pager tag -l | grep "$version" | xargs)
-
 if [[ $checkTag != "" ]];
 then
   echo "$checkTag already exist, skipping release."
