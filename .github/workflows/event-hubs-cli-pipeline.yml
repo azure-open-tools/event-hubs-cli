@@ -35,6 +35,7 @@ jobs:
   release:
     name: Release
     needs: [build]
+    if: github.ref == 'refs/heads/master'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -51,7 +52,6 @@ jobs:
         
     - name: Release
       shell: bash
-      if: ${{ github.ref == 'master' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
