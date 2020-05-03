@@ -43,7 +43,7 @@ jobs:
     steps:
     - name: Release
       shell: bash
-      if: ${{ success() && github.ref == "master" }}
+      if: ${{ success() && github.ref == 'master' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
