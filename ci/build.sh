@@ -17,7 +17,7 @@ then
 	set GOOS="$targetos"
 	set GO111MODULE=on
 	extension=".exe"
-	go build -ldflags "-s -w" -o "$name-windows""$targetarch"-"$version""$extension" main.go
+	go build -ldflags "-s -w" -o "$name-windows-""$targetarch"-"$version""$extension" main.go
 	mv "$name-windows""$targetarch"-"$version""$extension" ../
 	ls -lah
 else

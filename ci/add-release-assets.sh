@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 git fetch --all
-git branch
 latestTag="$(git --no-pager tag -l | tail -1)"
 
 # git for-each-ref --sort=creatordate --format '%(creatordate)'
