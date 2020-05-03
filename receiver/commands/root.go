@@ -23,7 +23,7 @@ you can use this tool to start a listener (consumer) against Azure Event Hubs.
 
 Straight to the point:
 
-receiver -c "<conn-string>" 
+		receiver -c "<conn-string>" 
 
 the command above uses the $Default consumer group, for development environment maybe will not be an issue.
 when the listener start, it will print the Data field from the event to the stdout.
@@ -31,36 +31,36 @@ when the listener start, it will print the Data field from the event to the stdo
 in environment which you have many listeners better if you use a specific consumer group to your need, to avoid disconnect 
 others, you can use the command with -g flag to use your consumer group for debugging:
 
-receiver -g "debug-consumer" -c "<conn-string>" 
+		receiver -g "debug-consumer" -c "<conn-string>" 
 
 with a -v flag you can print out the whole Event struct (json)
 
-receiver -v -g "debug-consumer" -c "<conn-string>" 
+		receiver -v -g "debug-consumer" -c "<conn-string>" 
 
 if you desire to avoid print all incoming events, you can filter by the data field or properties field like this:
 
 data filter:
 
-receiver -v -d "my message content filter" -g "debug-consumer" -c "<conn-string>"
+		receiver -v -d "my message content filter" -g "debug-consumer" -c "<conn-string>"
 
 property filter:
 
-receiver -v -p "property filter" -g "debug-consumer" -c "<conn-string>"
+		receiver -v -p "property filter" -g "debug-consumer" -c "<conn-string>"
 
 you can also provide more than one filter, just providing more than one -d or -p flag, like this:
 
-receiver -v -p "property filter1" -p "property filter2" -p "property filter3" -g "debug-consumer" -c "<conn-string>"
+		receiver -v -p "property filter1" -p "property filter2" -p "property filter3" -g "debug-consumer" -c "<conn-string>"
 
 you can save all the output sending them to a file like this:
 
-receiver -v -g "<consumer-group>" -c "<conn-string>" > output.json
+		receiver -v -g "<consumer-group>" -c "<conn-string>" > output.json
 
 it will not generate a well formatted json, but each line of that file will be a valid json since you are using -v flag.
 with that file you can play alongside the sender (producer) to replay all the file content to an event hub you wish.
 
 write events to multiple json files using -s flag:
 
-receiver -v -s -f ${PWD}/ -p "<filter1>" -g "<consumer-group>" -c "<conn-string>"
+		receiver -v -s -f ${PWD}/ -p "<filter1>" -g "<consumer-group>" -c "<conn-string>"
 
 the command above will generate a json file for each event arrived that match the property filter. in case of a path was not
 provided the current folder will be used.

@@ -1,0 +1,28 @@
+name: ehs
+summary: A cli to send events (messages) to Azure Event Hubs
+description: |
+  With this cli you can send events to event hubs in different ways.
+  You can send single event, batch, with repetition and more.
+version: '1.0'
+grade: stable
+confinement: strict
+
+parts:
+  ehs:
+    plugin: go
+    go-importpath: github.com/azure-open-tools/event-hubs-cli/sender
+    source: https://github.com/azure-open-tools/event-hubs-cli
+    source-type: git
+
+plugs:
+  ehs-network:
+    interface: network
+  ehs-files:
+    interface: system-files
+
+apps:
+  ehs:
+    command: bin/ehs
+    plugs:
+      - ehs-files
+      - ehs-network
