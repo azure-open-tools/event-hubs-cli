@@ -19,7 +19,7 @@ then
 	set GO111MODULE=on
 	extension=".exe"
 	go build -ldflags "-s -w" -o "$name-windows-""$targetarch"-"$version""$extension" main.go
-	mv "$name-windows""$targetarch"-"$version""$extension" ../
+	mv "$name-windows-""$targetarch"-"$version""$extension" ../
 	ls -lah
 else
   targetos=$(sw_vers | awk '{print $2$3$4}' | head -n 1)
