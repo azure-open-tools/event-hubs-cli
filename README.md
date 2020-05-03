@@ -1,8 +1,7 @@
 # Introduction
 
 # Build
-
-[![Build Status](https://dev.azure.com/fafg/eh-sender-receiver/_apis/build/status/fafg.eh-sender-receiver?branchName=master)](https://dev.azure.com/fafg/eh-sender-receiver/_build/latest?definitionId=3&branchName=master)
+![Event-Hubs-Cli](https://github.com/azure-open-tools/event-hubs-cli/workflows/Event-Hubs-Cli/badge.svg)
 
 to build it locally you can do:
 ```shell script
