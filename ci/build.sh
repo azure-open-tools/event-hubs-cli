@@ -6,6 +6,7 @@ name=$2
 go version
 echo "$OS"
 echo "$targetarch"
+echo "GitHubRef: $GITHUB_REF"
 
 targetos="$OS"
 targetarch="amd64"

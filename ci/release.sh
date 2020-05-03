@@ -11,6 +11,7 @@ else
 fi
 
 git fetch --all
+echo "GitHubRef: $GITHUB_REF"
 checkTag=$(git --no-pager tag -l | grep "$version" | xargs)
 if [[ $checkTag != "" ]];
 then
