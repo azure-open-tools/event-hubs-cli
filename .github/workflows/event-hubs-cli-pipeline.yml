@@ -25,6 +25,7 @@ jobs:
     - name: Build
       shell: bash
       run: |
+        go env
         cd sender
         make build-local
         cd ..
