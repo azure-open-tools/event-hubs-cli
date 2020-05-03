@@ -4,7 +4,7 @@ build-local:
 	@ golangci-lint run
 	@ go version
 	@ go clean
-	@ go build -o sender-bin sender/main.go
+	@ go build -o receiver-bin main.go
 
 build-release:
 	@ golangci-lint run

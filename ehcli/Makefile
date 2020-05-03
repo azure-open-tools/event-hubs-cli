@@ -6,7 +6,7 @@ lint:
 build-local: lint
 	@ go version
 	@ go clean
-	@ go build -o sender-bin sender/main.go
+	@ go build -o ehcli-bin main.go
 
 build-release: lint
 	@ chmod +x ../ci/build.sh
