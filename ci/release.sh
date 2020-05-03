@@ -8,7 +8,7 @@ packageVersion=$2
 function getLatestTag() {
   echo "cloning into the temp folder"
   mkdir temp && cd temp || exit 1
-  git clone git@github.com:azure-open-tools/event-hubs-cli.git
+  git clone https://github.com/azure-open-tools/event-hubs-cli.git
   cd event-hubs-cli || exit 1
   git fetch --all
 }
