@@ -1,10 +1,10 @@
 SHELL:=/bin/bash
 
-build-local:
+build:
 	@ docker run --rm -v ${PWD}:/app -w /app golangci/golangci-lint:v1.25.1 golangci-lint run
 	@ go version
 	@ go clean
-	@ go build -o sender-bin main.go
+	@ env GO111MODULE=on GOOS="linux" GOARCH="$targetarch" go build -ldflags "-s -w" -o ehs main.go
 
 build-release:
 	@ chmod +x ../ci/build.sh
