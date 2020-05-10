@@ -1,7 +1,7 @@
-name: ehs
+name: <finalName>
 version: v1.0.1
-summary: A cli to send events (messages) to Azure Event Hubs
-description: |
+summary: <A cli to send events (messages) to Azure Event Hubs> //SUMARY
+description: | //DESCRIPTION
   With this cli you can send events to event hubs in different ways.
   You can send single event, batch, with repetition and more. Make your life
   esier when debug event hubs application.
@@ -10,7 +10,7 @@ confinement: classic
 base: core18
 
 parts:
-  ehs:
+  <finalName>:
     plugin: nil
     build-snaps: [go]
     override-build: |
@@ -23,11 +23,11 @@ parts:
 
       git clone --branch=$SNAPCRAFT_PROJECT_VERSION https://github.com/azure-open-tools/event-hubs-cli.git
 
-      cd event-hubs-cli/sender
+      cd event-hubs-cli/<package>
       make build-release
 
       ls -lah $GOPATH/src/github.com/azure-open-tools/event-hubs-cli/
-      cp $GOPATH/src/github.com/azure-open-tools/event-hubs-cli/ehs-linux-amd64-v1.0.1 $SNAPCRAFT_PART_INSTALL/ehs
+      cp $GOPATH/src/github.com/azure-open-tools/event-hubs-cli/<name>-linux-<arch>-<version> $SNAPCRAFT_PART_INSTALL/<finalName>
 
     build-packages:
       - git
@@ -35,5 +35,5 @@ parts:
       - make
 
 apps:
-  ehs-test:
-    command: ehs --version
+  <finalName>-test:
+    command: <finalName> --version
