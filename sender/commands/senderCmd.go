@@ -12,6 +12,7 @@ import (
 	"github.com/vbauerster/mpb/v5"
 	"io"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -65,7 +66,7 @@ func RunSender(args senderArgs) error {
 
 func newSenderCli(connStr string, properties []string, base64 bool, numberOfMessages int64) error {
 	builder := sender.NewSenderBuilder()
-	builder.SetConnectionString(connStr)
+	builder.SetConnectionString(getConnString(connStr))
 	builder.AddProperties(properties)
 	builder.SetBase64(base64)
 	builder.SetNumberOfMessages(numberOfMessages)
@@ -89,6 +90,14 @@ func newSenderCli(connStr string, properties []string, base64 bool, numberOfMess
 	}
 
 	return err
+}
+
+func getConnString(connString string) string {
+	if len(strings.TrimSpace(connString)) > 0 {
+		return connString
+	} else {
+		return os.Getenv("EVENTHUB_SEND_CONNSTR")
+	}
 }
 
 func (cli *senderCli) sendMessage(message string, batch bool, repeat int, interval int) error {
@@ -193,7 +202,7 @@ func OnBeforeSendBatchMessage(batchSize int, workerIndex int) {
 
 func OnAfterSendBatchMessage(batchSizeSent int, workerIndex int) {
 	if mCli != nil && mCli.sendBatchBar != nil {
-		if _, exist := mCli.sendBatchBar[workerIndex]; !exist {
+		if _, exist := mCli.sendBatchBar[workerIndex]; exist {
 			mCli.sendBatchBar[workerIndex].IncrBy(batchSizeSent)
 			mCli.sendBatchBar[workerIndex].DecoratorEwmaUpdate(time.Since(mCli.start))
 		}

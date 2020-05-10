@@ -9,6 +9,7 @@ import (
 	"github.com/azure-open-tools/event-hubs/receiver"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 )
 
@@ -41,7 +42,7 @@ func RunListen(args listenArgs) error {
 	if builder != nil {
 		builder.AddDataFilters(args.dataFilter)
 		builder.AddPropertyFilters(args.propertyFilter)
-		builder.SetConnectionString(args.connString)
+		builder.SetConnectionString(getConnString(args.connString))
 		builder.SetConsumerGroup(args.consumerGroup)
 		builder.AddListenerPartitionIds(args.partitionIds)
 		builder.SetReceiverHandler(OnReceiverHandler)
@@ -68,6 +69,14 @@ func RunListen(args listenArgs) error {
 	}
 
 	return errors.New("was not possible to start the listener")
+}
+
+func getConnString(connString string) string {
+	if len(strings.TrimSpace(connString)) > 0 {
+		return connString
+	} else {
+		return os.Getenv("EVENTHUB_LISTEN_CONNSTR")
+	}
 }
 
 func startListener(args listenArgs, rcv *receiver.Receiver, ctx context.Context) {

@@ -81,7 +81,6 @@ func init() {
 	rootCmd.Flags().BoolVarP(&largs.splitOutputIntoFiles, "split-output-files", "s", false, "for each event received it will be saved in an isolated json file. Works only with verbose (-v) flag")
 	rootCmd.Flags().StringVarP(&largs.pathToWriteFiles, "path-files", "f", "", "path where the files will be written with Split-Output-Files flag. if not provided, current directory(PWD) will be used.")
 
-	_ = rootCmd.MarkFlagRequired("connstring")
 	rootCmd.SetVersionTemplate(EventHubAscii)
 	rootCmd.Version = Version
 }

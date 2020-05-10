@@ -49,7 +49,6 @@ func init() {
 	rootCmd.Flags().BoolVarP(&largs.replayMessages, "replay-messages", "e", false, "replay messages")
 	rootCmd.Flags().BoolVarP(&largs.batch, "batch", "g", false, "send messages in batches")
 
-	_ = rootCmd.MarkFlagRequired("connstring")
 	_ = rootCmd.MarkFlagRequired("message")
 
 	rootCmd.SetVersionTemplate(EventHubAscii)
