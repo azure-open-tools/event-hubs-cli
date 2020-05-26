@@ -63,6 +63,7 @@ func RunListen(args listenArgs) error {
 			<-signalChan
 
 			stopListener(rcv, ctx)
+			return nil
 		} else {
 			return err
 		}
@@ -96,7 +97,7 @@ func stopListener(rcv *receiver.Receiver, ctx context.Context) {
 
 	err := rcv.StopListener(ctx)
 	if err == nil {
-		fmt.Println("finished")
+		fmt.Println("done")
 	} else {
 		fmt.Println(err)
 	}

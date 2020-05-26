@@ -3,6 +3,9 @@
 # Build
 ![Event-Hubs-Cli](https://github.com/azure-open-tools/event-hubs-cli/workflows/Event-Hubs-Cli/badge.svg)
 
+EVENTHUB_SEND_CONNSTR
+EVENTHUB_LISTEN_CONNSTR
+
 to build it locally you can do:
 ```shell script
 make build-local-sender && make build-local-receiver
