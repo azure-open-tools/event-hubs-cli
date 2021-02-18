@@ -52,9 +52,7 @@ var (
 )
 
 func RunSender(args senderArgs) error {
-	var err error
-	err = newSenderCli(args.connStr, args.properties, args.base64, int64(args.numberOfMessages))
-
+	err := newSenderCli(args.connStr, args.properties, args.base64, int64(args.numberOfMessages))
 	if err == nil {
 		if args.replayMessages {
 			return mCli.replayMessage(args.fileMessagePath, args.repeat, args.interval)
