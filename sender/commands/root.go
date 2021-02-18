@@ -17,6 +17,7 @@ var largs = senderArgs {
 	interval           : 0,
 	replayMessages     : false,
 	fileMessagePath    : "",
+	templateFile       : false,
 }
 
 var rootCmd = &cobra.Command{
@@ -27,8 +28,6 @@ you can use this tool to start a sender (producer) against Azure Event Hubs.
 Straight to the point:
 
 ehst .....
-
-
 
 `,
 	Example: "",
@@ -48,8 +47,7 @@ func init() {
 	rootCmd.Flags().BoolVarP(&largs.base64, "base64", "b", false, "if present the sender will try to decode the base64 to byte[] before send. Useful when you are using protobuffer messages")
 	rootCmd.Flags().BoolVarP(&largs.replayMessages, "replay-messages", "e", false, "replay messages")
 	rootCmd.Flags().BoolVarP(&largs.batch, "batch", "g", false, "send messages in batches")
-
-	_ = rootCmd.MarkFlagRequired("message")
+	rootCmd.Flags().BoolVarP(&largs.templateFile, "template", "t", false, "uses a template file name in order to send certain amount of events")
 
 	rootCmd.SetVersionTemplate(EventHubAscii)
 	rootCmd.Version = Version
