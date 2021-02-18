@@ -132,7 +132,7 @@ func (cli *senderCli) send(message string, repeat int, interval int) error {
 		err = cli.sender.SendMessage(message, context.Background())
 
 		if err != nil {
-			return err
+			fmt.Println(err)
 		}
 		cli.sendWaitGroup.Done()
 
@@ -161,7 +161,7 @@ func (cli *senderCli) sendBatch(message string, repeat int, interval int) error 
 		err = cli.sender.SendBatchMessage(message, context.Background())
 
 		if err != nil {
-			return err
+			fmt.Println(err)
 		}
 
 		cli.sendWaitGroup.Done()
