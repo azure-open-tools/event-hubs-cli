@@ -9,41 +9,42 @@ import (
 	"event-hubs-cli/sender/common"
 	"event-hubs-cli/sender/models"
 	"fmt"
-	eventhub "github.com/Azure/azure-event-hubs-go/v3"
-	"github.com/azure-open-tools/event-hubs/sender"
-	"github.com/google/uuid"
-	"github.com/vbauerster/mpb/v5"
 	"io"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	eventhub "github.com/Azure/azure-event-hubs-go/v3"
+	"github.com/azure-open-tools/event-hubs/sender"
+	"github.com/google/uuid"
+	"github.com/vbauerster/mpb/v5"
 )
 
 type (
-	 senderArgs struct {
-		message            string
-		base64             bool
-		batch              bool
-		connStr            string
-		properties         []string
-		numberOfMessages   int
-		repeat             int
-		interval           int
-		replayMessages     bool
-		fileMessagePath    string
-		templateFile       bool
+	senderArgs struct {
+		message          string
+		base64           bool
+		batch            bool
+		connStr          string
+		properties       []string
+		numberOfMessages int
+		repeat           int
+		interval         int
+		replayMessages   bool
+		fileMessagePath  string
+		templateFile     bool
 	}
 
-	 senderCli struct {
-		numberOfMessages   int64
-		sender             *sender.Sender
-		sendWaitGroup      *sync.WaitGroup
-		sendProgress       *mpb.Progress
-		sendBar            *mpb.Bar
-		sendBatchBar	   map[int]*mpb.Bar
-		start              time.Time
+	senderCli struct {
+		numberOfMessages int64
+		sender           *sender.Sender
+		sendWaitGroup    *sync.WaitGroup
+		sendProgress     *mpb.Progress
+		sendBar          *mpb.Bar
+		sendBatchBar     map[int]*mpb.Bar
+		start            time.Time
 	}
 )
 
@@ -84,10 +85,10 @@ func newSenderCli(connStr string, properties []string, base64 bool, numberOfMess
 	snd, err := builder.GetSender()
 	if err == nil {
 		cli := &senderCli{
-			sender:             snd,
-			numberOfMessages:   numberOfMessages,
-			sendWaitGroup:      &sync.WaitGroup{},
-			sendBatchBar: 		make(map[int]*mpb.Bar),
+			sender:           snd,
+			numberOfMessages: numberOfMessages,
+			sendWaitGroup:    &sync.WaitGroup{},
+			sendBatchBar:     make(map[int]*mpb.Bar),
 		}
 		cli.sendProgress = mpb.New(mpb.WithWidth(64), mpb.WithWaitGroup(cli.sendWaitGroup))
 		mCli = cli
@@ -222,7 +223,7 @@ func OnBeforeSendMessage(*eventhub.Event) {
 }
 
 func OnAfterSendMessage(event *eventhub.Event) {
-	if event != nil && mCli.sendBar != nil{
+	if event != nil && mCli.sendBar != nil {
 		mCli.sendBar.Increment()
 		mCli.sendBar.DecoratorEwmaUpdate(time.Since(mCli.start))
 		//mCli.sendBar.DecoratorAverageAdjust(mCli.start)
@@ -276,6 +277,33 @@ func (cli *senderCli) replayMessageFile(filePath string) error {
 	return nil
 }
 
+func findPayloadField(fields []string) (string, error) {
+	for _, field := range fields {
+		if strings.Contains(field, ":") {
+			keyVal := strings.Split(field, ":")
+
+			if keyVal[0] == "payload" {
+				return keyVal[1], nil
+			}
+		}
+	}
+	return "", errors.New("payload not found")
+}
+
+func findPropertyFields(fields []string) map[string]string {
+	result := make(map[string]string)
+	for _, field := range fields {
+		if strings.Contains(field, ":") {
+			keyVal := strings.Split(field, ":")
+
+			if keyVal[0] != "payload" {
+				result[keyVal[0]] = keyVal[1]
+			}
+		}
+	}
+	return result
+}
+
 func (cli *senderCli) templateMessageFile(filePath string) error {
 	var eofErr error
 	var line string
@@ -292,33 +320,47 @@ func (cli *senderCli) templateMessageFile(filePath string) error {
 
 	for eofErr != io.EOF {
 		line, eofErr = rd.ReadString('\n')
-		if len(strings.TrimSpace(line)) > 170 {
-			if eofErr != nil {
-				fmt.Println(eofErr)
-			}
+
+		// if the line contains something
+		if len(line) > 0 {
 
 			guid := uuid.New().String()
+
 			fields := strings.Split(line, ";")
+			payload, pErr := findPayloadField(fields)
 
-			if strings.Contains(line, "[epoch]") {
-				fields[0] = strings.ReplaceAll(fields[0], "[epoch]", strconv.FormatInt(time.Now().Unix(), 10))
-			}
-			if strings.Contains(fields[1], "[guid]") {
-				fields[1] = strings.ReplaceAll(fields[1], "[guid]", guid)
+			if pErr != nil {
+				fmt.Println("Payload not found. Skipping message")
+				continue
 			}
 
-			event = createAnEvent(true, fields[5])
+			event = createAnEvent(true, payload)
 			event.ID = guid
-			event.Set(strings.Split(fields[0], ":")[0], strings.Split(fields[0], ":")[1])
-			event.Set(strings.Split(fields[1], ":")[0], strings.Split(fields[1], ":")[1])
-			event.Set(strings.Split(fields[2], ":")[0], strings.Split(fields[2], ":")[1])
-			event.Set(strings.Split(fields[3], ":")[0], strings.Split(fields[3], ":")[1])
-			event.Set(strings.Split(fields[4], ":")[0], strings.Split(fields[4], ":")[1])
-			events = append(events, event)
 
-			if eofErr != nil {
-				fmt.Println(eofErr)
+			if len(fields) > 1 {
+				properties := findPropertyFields(fields)
+
+				for k, v := range properties {
+					if strings.Contains(v, "[epoch]") {
+						v = strings.ReplaceAll(v, "[epoch]", strconv.FormatInt(time.Now().Unix(), 10))
+					}
+					if strings.Contains(v, "[guid]") {
+						v = strings.ReplaceAll(v, "[guid]", guid)
+					}
+
+					// add deviceId additionally to SystemProperties
+					if k == "deviceId" {
+						deviceId := v
+						if event.SystemProperties == nil {
+							event.SystemProperties = &eventhub.SystemProperties{}
+						}
+						event.SystemProperties.IoTHubDeviceConnectionID = &deviceId
+					}
+					event.Set(k, v)
+				}
 			}
+
+			events = append(events, event)
 		}
 	}
 
