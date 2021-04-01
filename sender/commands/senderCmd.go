@@ -294,39 +294,42 @@ func (cli *senderCli) templateMessageFile(filePath string) error {
 	for eofErr != io.EOF {
 		line, eofErr = rd.ReadString('\n')
 
-		guid := uuid.New().String()
-		fields := strings.Split(line, ";")
+		// if the line contains something
+		if len(line) > 0 {
 
-		// reading last element from Array as payload
-		event = createAnEvent(true, fields[len(fields)-1])
-		event.ID = guid
+			guid := uuid.New().String()
+			fields := strings.Split(line, ";")
 
-		if len(fields) > 1 {
-			// slice excluding last field which should contain payload
-			for _, field := range fields[0 : len(fields)-1] {
-				if strings.Contains(field, ":") {
-					if strings.Contains(field, "[epoch]") {
-						field = strings.ReplaceAll(field, "[epoch]", strconv.FormatInt(time.Now().Unix(), 10))
-					}
-					if strings.Contains(field, "[guid]") {
-						field = strings.ReplaceAll(field, "[guid]", guid)
-					}
-					keyVal := strings.Split(field, ":")
+			// reading last element from Array as payload
+			event = createAnEvent(true, fields[len(fields)-1])
+			event.ID = guid
 
-					if keyVal[0] == "deviceId" {
-						deviceId := keyVal[1]
-						if event.SystemProperties == nil {
-							event.SystemProperties = &eventhub.SystemProperties{}
+			if len(fields) > 1 {
+				// slice excluding last field which should contain payload
+				for _, field := range fields[0 : len(fields)-1] {
+					if strings.Contains(field, ":") {
+						if strings.Contains(field, "[epoch]") {
+							field = strings.ReplaceAll(field, "[epoch]", strconv.FormatInt(time.Now().Unix(), 10))
 						}
-						event.SystemProperties.IoTHubDeviceConnectionID = &deviceId
+						if strings.Contains(field, "[guid]") {
+							field = strings.ReplaceAll(field, "[guid]", guid)
+						}
+						keyVal := strings.Split(field, ":")
+
+						if keyVal[0] == "deviceId" {
+							deviceId := keyVal[1]
+							if event.SystemProperties == nil {
+								event.SystemProperties = &eventhub.SystemProperties{}
+							}
+							event.SystemProperties.IoTHubDeviceConnectionID = &deviceId
+						}
+						event.Set(keyVal[0], keyVal[1])
 					}
-					event.Set(keyVal[0], keyVal[1])
 				}
 			}
+
+			events = append(events, event)
 		}
-
-		events = append(events, event)
-
 	}
 
 	return cli.sender.SendEventsAsBatch(context.Background(), &events)
