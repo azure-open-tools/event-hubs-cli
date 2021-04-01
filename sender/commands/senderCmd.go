@@ -277,6 +277,33 @@ func (cli *senderCli) replayMessageFile(filePath string) error {
 	return nil
 }
 
+func findPayloadField(fields []string) (string, error) {
+	for _, field := range fields {
+		if strings.Contains(field, ":") {
+			keyVal := strings.Split(field, ":")
+
+			if keyVal[0] == "payload" {
+				return keyVal[1], nil
+			}
+		}
+	}
+	return "", errors.New("payload not found")
+}
+
+func findPropertyFields(fields []string) map[string]string {
+	result := make(map[string]string)
+	for _, field := range fields {
+		if strings.Contains(field, ":") {
+			keyVal := strings.Split(field, ":")
+
+			if keyVal[0] != "payload" {
+				result[keyVal[0]] = keyVal[1]
+			}
+		}
+	}
+	return result
+}
+
 func (cli *senderCli) templateMessageFile(filePath string) error {
 	var eofErr error
 	var line string
@@ -298,33 +325,38 @@ func (cli *senderCli) templateMessageFile(filePath string) error {
 		if len(line) > 0 {
 
 			guid := uuid.New().String()
-			fields := strings.Split(line, ";")
 
+			fields := strings.Split(line, ";")
+			payload, pErr := findPayloadField(fields)
+
+			if pErr != nil {
+				// print warning
+				continue
+			}
 			// reading last element from Array as payload
-			event = createAnEvent(true, fields[len(fields)-1])
+			event = createAnEvent(true, payload)
 			event.ID = guid
 
 			if len(fields) > 1 {
-				// slice excluding last field which should contain payload
-				for _, field := range fields[0 : len(fields)-1] {
-					if strings.Contains(field, ":") {
-						if strings.Contains(field, "[epoch]") {
-							field = strings.ReplaceAll(field, "[epoch]", strconv.FormatInt(time.Now().Unix(), 10))
-						}
-						if strings.Contains(field, "[guid]") {
-							field = strings.ReplaceAll(field, "[guid]", guid)
-						}
-						keyVal := strings.Split(field, ":")
+				properties := findPropertyFields(fields)
 
-						if keyVal[0] == "deviceId" {
-							deviceId := keyVal[1]
-							if event.SystemProperties == nil {
-								event.SystemProperties = &eventhub.SystemProperties{}
-							}
-							event.SystemProperties.IoTHubDeviceConnectionID = &deviceId
-						}
-						event.Set(keyVal[0], keyVal[1])
+				for k, v := range properties {
+					if strings.Contains(v, "[epoch]") {
+						v = strings.ReplaceAll(v, "[epoch]", strconv.FormatInt(time.Now().Unix(), 10))
 					}
+					if strings.Contains(v, "[guid]") {
+						v = strings.ReplaceAll(v, "[guid]", guid)
+					}
+
+					// add deviceId additionally to SystemProperties
+					if k == "deviceId" {
+						deviceId := v
+						if event.SystemProperties == nil {
+							event.SystemProperties = &eventhub.SystemProperties{}
+						}
+						event.SystemProperties.IoTHubDeviceConnectionID = &deviceId
+					}
+					event.Set(k, v)
 				}
 			}
 
