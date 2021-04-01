@@ -330,10 +330,10 @@ func (cli *senderCli) templateMessageFile(filePath string) error {
 			payload, pErr := findPayloadField(fields)
 
 			if pErr != nil {
-				// print warning
+				fmt.Println("Payload not found. Skipping message")
 				continue
 			}
-			// reading last element from Array as payload
+
 			event = createAnEvent(true, payload)
 			event.ID = guid
 
