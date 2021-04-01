@@ -293,48 +293,40 @@ func (cli *senderCli) templateMessageFile(filePath string) error {
 
 	for eofErr != io.EOF {
 		line, eofErr = rd.ReadString('\n')
-		if len(strings.TrimSpace(line)) > 170 {
-			if eofErr != nil {
-				fmt.Println(eofErr)
-			}
 
-			guid := uuid.New().String()
-			fields := strings.Split(line, ";")
+		guid := uuid.New().String()
+		fields := strings.Split(line, ";")
 
-			// reading last element from Array as payload
-			event = createAnEvent(true, fields[len(fields)-1])
-			event.ID = guid
+		// reading last element from Array as payload
+		event = createAnEvent(true, fields[len(fields)-1])
+		event.ID = guid
 
-			if len(fields) > 1 {
-				// slice excluding last field which should contain payload
-				for _, field := range fields[0 : len(fields)-1] {
-					if strings.Contains(field, ":") {
-						if strings.Contains(field, "[epoch]") {
-							field = strings.ReplaceAll(field, "[epoch]", strconv.FormatInt(time.Now().Unix(), 10))
-						}
-						if strings.Contains(field, "[guid]") {
-							field = strings.ReplaceAll(field, "[guid]", guid)
-						}
-						keyVal := strings.Split(field, ":")
-
-						if keyVal[0] == "deviceId" {
-							deviceId := keyVal[1]
-							if event.SystemProperties == nil {
-								event.SystemProperties = &eventhub.SystemProperties{}
-							}
-							event.SystemProperties.IoTHubDeviceConnectionID = &deviceId
-						}
-						event.Set(keyVal[0], keyVal[1])
+		if len(fields) > 1 {
+			// slice excluding last field which should contain payload
+			for _, field := range fields[0 : len(fields)-1] {
+				if strings.Contains(field, ":") {
+					if strings.Contains(field, "[epoch]") {
+						field = strings.ReplaceAll(field, "[epoch]", strconv.FormatInt(time.Now().Unix(), 10))
 					}
+					if strings.Contains(field, "[guid]") {
+						field = strings.ReplaceAll(field, "[guid]", guid)
+					}
+					keyVal := strings.Split(field, ":")
+
+					if keyVal[0] == "deviceId" {
+						deviceId := keyVal[1]
+						if event.SystemProperties == nil {
+							event.SystemProperties = &eventhub.SystemProperties{}
+						}
+						event.SystemProperties.IoTHubDeviceConnectionID = &deviceId
+					}
+					event.Set(keyVal[0], keyVal[1])
 				}
 			}
-
-			events = append(events, event)
-
-			if eofErr != nil {
-				fmt.Println(eofErr)
-			}
 		}
+
+		events = append(events, event)
+
 	}
 
 	return cli.sender.SendEventsAsBatch(context.Background(), &events)
