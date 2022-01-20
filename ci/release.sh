@@ -35,7 +35,7 @@ then
   exit 0
 fi
 
-latestTag="$(git --no-pager tag -l | tail -1)"
+latestTag="$(git for-each-ref --sort=taggerdate --format '%(tag)' | tail -1)"
 changeLog="$(git --no-pager log --oneline "$latestTag"...HEAD)"
 
 echo "New Version: $version"
